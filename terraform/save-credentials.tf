@@ -14,7 +14,7 @@ resource "aws_lambda_function" "save_credentials" {
 
   environment {
     variables = {
-      CREDENTIALS_TABLE = "devCredentials"
+      CREDENTIALS_TABLE = "${terraform.workspace}Credentials"
     }
   }
 }
