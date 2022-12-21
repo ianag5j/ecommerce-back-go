@@ -10,15 +10,18 @@ terraform {
     }
   }
 
-  required_version = "~> 1.0"
-
   backend "s3" {
-    bucket = "terraform-state-ian"
-    key    = "terraform"
-    region = "us-east-1"
+    bucket         = "terraform-state-ian"
+    dynamodb_table = "tf-lock-table"
+    key            = "eccomerce-back-go"
+    region         = "us-east-1"
   }
+
+  required_version = "~> 1.0"
 }
 
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
+
+data "aws_caller_identity" "current" {}
