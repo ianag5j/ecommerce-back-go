@@ -34,7 +34,6 @@ resource "aws_cloudwatch_log_group" "save_credentials" {
 }
 
 # ############ API GATEWAY ############
-
 resource "aws_apigatewayv2_integration" "save_credentials" {
   api_id = var.api_id
 
