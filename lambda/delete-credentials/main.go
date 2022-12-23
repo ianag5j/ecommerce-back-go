@@ -49,7 +49,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 	res.Message = "success"
 	response, _ := json.Marshal(res)
-	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: 200}, nil
+	return events.APIGatewayProxyResponse{
+		Body:       string(response),
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		StatusCode: 200,
+	}, nil
 }
 
 func main() {

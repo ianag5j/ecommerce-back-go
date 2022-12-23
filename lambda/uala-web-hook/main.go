@@ -37,7 +37,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		responseStatus = 500
 	}
 	response, _ := json.Marshal(res)
-	return events.APIGatewayProxyResponse{Body: string(response), StatusCode: responseStatus}, nil
+	return events.APIGatewayProxyResponse{
+		Body:       string(response),
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		StatusCode: responseStatus,
+	}, nil
 }
 
 func main() {
