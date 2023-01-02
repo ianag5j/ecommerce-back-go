@@ -49,12 +49,14 @@ func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) bool 
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":status":    &types.AttributeValueMemberS{Value: status},
 			":updatedAt": &types.AttributeValueMemberS{Value: time.Now().Format(time.RFC3339)},
+			":id":        &types.AttributeValueMemberS{Value: orderId},
 		},
 		ExpressionAttributeNames: map[string]string{
 			"#s": "Status",
 			"#u": "UpdatedAt",
 		},
-		ReturnValues: "UPDATED_NEW",
+		ConditionExpression: aws.String("id = :id"),
+		ReturnValues:        "UPDATED_NEW",
 	})
 	fmt.Println(o.Attributes)
 	fmt.Println(err)
