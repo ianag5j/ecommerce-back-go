@@ -2,7 +2,7 @@ package services
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"os"
 	"time"
 
@@ -13,7 +13,7 @@ import (
 )
 
 type DynamodbService interface {
-	UpdateOrderStatus(orderId string, status string) bool
+	UpdateOrderStatus(orderId string, status string) (bool, error)
 }
 
 type dynamodbService struct {
@@ -39,8 +39,8 @@ func New() DynamodbService {
 	}
 }
 
-func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) bool {
-	o, err := d.svc.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
+func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) (bool, error) {
+	_, err := d.svc.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
 		TableName: aws.String(os.Getenv("ORDERS_TABLE")),
 		Key: map[string]types.AttributeValue{
 			"Id": &types.AttributeValueMemberS{Value: orderId},
@@ -58,7 +58,12 @@ func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) bool 
 		ConditionExpression: aws.String("id = :id"),
 		ReturnValues:        "UPDATED_NEW",
 	})
-	fmt.Println(o.Attributes)
-	fmt.Println(err)
-	return err == nil
+	e := err
+	if err != nil {
+		var eccf *types.ConditionalCheckFailedException
+		if errors.As(err, &eccf) {
+			e = errors.New("order not found")
+		}
+	}
+	return err == nil, e
 }
