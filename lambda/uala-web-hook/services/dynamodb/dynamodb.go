@@ -55,7 +55,7 @@ func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) (bool
 			"#s": "Status",
 			"#u": "UpdatedAt",
 		},
-		ConditionExpression: aws.String("id = :id"),
+		ConditionExpression: aws.String("Id = :id"),
 		ReturnValues:        "UPDATED_NEW",
 	})
 	e := err

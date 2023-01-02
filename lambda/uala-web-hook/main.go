@@ -16,6 +16,10 @@ type BodyRequest struct {
 
 type Response struct {
 	Message string
+}
+
+type ResponseError struct {
+	Message string
 	Error   string
 }
 
@@ -27,19 +31,20 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	dynamodbService := ds.New()
 	isUpdated, err := dynamodbService.UpdateOrderStatus(request.PathParameters["orderId"], body.Status)
-	res := Response{
-		Message: "Success",
-	}
-	responseStatus := 200
 
+	responseStatus := 200
+	response, _ := json.Marshal(Response{
+		Message: "Success",
+	})
 	if !isUpdated {
-		res = Response{
+		res := ResponseError{
 			Message: "Error on update order",
 			Error:   err.Error(),
 		}
+		response, _ = json.Marshal(res)
 		responseStatus = 500
 	}
-	response, _ := json.Marshal(res)
+
 	return events.APIGatewayProxyResponse{
 		Body:       string(response),
 		Headers:    map[string]string{"Content-Type": "application/json"},
