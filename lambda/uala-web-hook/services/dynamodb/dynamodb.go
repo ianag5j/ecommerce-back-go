@@ -12,6 +12,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
+type DynamodbService interface {
+	UpdateOrderStatus(orderId string, status string) bool
+}
+
+type dynamodbService struct {
+	svc dynamodb.Client
+}
+
 func setup() dynamodb.Client {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
@@ -25,10 +33,14 @@ func setup() dynamodb.Client {
 	return *svc
 }
 
-func UpdateOrderStatus(orderId string, status string) bool {
-	svc := setup()
+func New() DynamodbService {
+	return &dynamodbService{
+		svc: setup(),
+	}
+}
 
-	_, err := svc.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
+func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) bool {
+	o, err := d.svc.UpdateItem(context.TODO(), &dynamodb.UpdateItemInput{
 		TableName: aws.String(os.Getenv("ORDERS_TABLE")),
 		Key: map[string]types.AttributeValue{
 			"Id": &types.AttributeValueMemberS{Value: orderId},
@@ -43,6 +55,7 @@ func UpdateOrderStatus(orderId string, status string) bool {
 			"#u": "UpdatedAt",
 		},
 	})
+	fmt.Println(o)
 	fmt.Println(err)
 	return err == nil
 }

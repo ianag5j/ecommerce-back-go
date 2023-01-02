@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"ianag5j/ecommerce-back-go/uala-web-hook/services"
+	ds "ianag5j/ecommerce-back-go/uala-web-hook/services/dynamodb"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -24,7 +24,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	body := BodyRequest{}
 	json.Unmarshal([]byte(request.Body), &body)
 
-	updated := services.UpdateOrderStatus(request.PathParameters["orderId"], body.Status)
+	dynamodbService := ds.New()
+	updated := dynamodbService.UpdateOrderStatus(request.PathParameters["orderId"], body.Status)
 	res := Response{
 		Message: "Success",
 	}
