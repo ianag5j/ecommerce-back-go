@@ -54,8 +54,9 @@ func (d *dynamodbService) UpdateOrderStatus(orderId string, status string) bool 
 			"#s": "Status",
 			"#u": "UpdatedAt",
 		},
+		ReturnValues: "UPDATED_NEW",
 	})
-	fmt.Println(o)
+	fmt.Println(o.Attributes)
 	fmt.Println(err)
 	return err == nil
 }
