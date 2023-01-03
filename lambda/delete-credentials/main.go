@@ -14,23 +14,14 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 
-	"ianag5j/ecommerce-back-go/save-credentials/utils"
+	"ianag5j/ecommerce-back-go/delete-credentials/utils"
 )
-
-type BodyRequest struct {
-	ExternalClientId     string `json:"externalClientId"`
-	ExternalClientSecret string `json:"externalClientSecret"`
-	ExternalUserName     string `json:"externalUserName"`
-}
 
 type Response struct {
 	Message string
 }
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	body := BodyRequest{}
-	json.Unmarshal([]byte(request.Body), &body)
-
 	cfg, err := config.LoadDefaultConfig(context.TODO(), func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
 		return nil
@@ -40,16 +31,14 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	svc := dynamodb.NewFromConfig(cfg)
-	_, err = svc.PutItem(context.TODO(), &dynamodb.PutItemInput{
+	_, err = svc.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{
 		TableName: aws.String(os.Getenv("CREDENTIALS_TABLE")),
-		Item: map[string]types.AttributeValue{
-			"UserId":               &types.AttributeValueMemberS{Value: utils.GetUserId(request.Headers["authorization"])},
-			"Provider":             &types.AttributeValueMemberS{Value: "Uala"},
-			"externalClientId":     &types.AttributeValueMemberS{Value: body.ExternalClientId},
-			"externalClientSecret": &types.AttributeValueMemberS{Value: body.ExternalClientSecret},
-			"externalUserName":     &types.AttributeValueMemberS{Value: body.ExternalUserName},
+		Key: map[string]types.AttributeValue{
+			"UserId":   &types.AttributeValueMemberS{Value: utils.GetUserId(request.Headers["authorization"])},
+			"Provider": &types.AttributeValueMemberS{Value: "Uala"},
 		},
 	})
+
 	res := Response{}
 
 	if err != nil {
