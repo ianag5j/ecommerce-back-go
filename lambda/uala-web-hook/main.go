@@ -46,8 +46,13 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	return events.APIGatewayProxyResponse{
-		Body:       string(response),
-		Headers:    map[string]string{"Content-Type": "application/json"},
+		Body: string(response),
+		Headers: map[string]string{
+			"Content-Type":                 "application/json",
+			"Access-Control-Allow-Headers": "*",
+			"Access-Control-Allow-Origin":  "*",
+			"Access-Control-Allow-Methods": "OPTIONS,POST",
+		},
 		StatusCode: responseStatus,
 	}, nil
 }
