@@ -17,6 +17,7 @@ type (
 		Id            string `dynamodbav:"Id"`
 		StoreId       string `dynamodbav:"StoreId"`
 		Amount        string `dynamodbav:"Amount"`
+		Status        string `dynamodbav:"Status"`
 		Cart          string `dynamodbav:"Cart"`
 		PaymentMethod string `dynamodbav:"PaymentMethod"`
 		CreatedAt     string `dynamodbav:"CreatedAt"`
@@ -62,6 +63,7 @@ func (table table) Create(storeId string, paymentMethod string, cart string) (Or
 		Id:      uuid.NewString(),
 		StoreId: storeId,
 		// Amount: ,
+		Status:        "PENDING",
 		PaymentMethod: paymentMethod,
 		Cart:          cart,
 		CreatedAt:     time.Now().Format(time.RFC3339),
