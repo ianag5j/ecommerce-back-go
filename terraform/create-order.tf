@@ -5,10 +5,10 @@ data "archive_file" "lambda_create_order_zip" {
 }
 
 resource "aws_lambda_function" "create_order" {
-  filename         = data.archive_file.lambda_zip.output_path
+  filename         = data.archive_file.lambda_create_order_zip.output_path
   function_name    = "${terraform.workspace}CreateOrderGo"
   handler          = "main"
-  source_code_hash = base64sha256(data.archive_file.lambda_zip.output_path)
+  source_code_hash = base64sha256(data.archive_file.lambda_create_order_zip.output_path)
   runtime          = "go1.x"
   role             = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dev_serverless_lambda"
 

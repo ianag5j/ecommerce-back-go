@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"ianag5j/ecommerce-back-go/create-order/internal/processor"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -9,11 +10,17 @@ import (
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	p := processor.New()
-	p.Process(request)
+	s := 200
+	r, err := p.Process(request)
+	if err != nil {
+		s = 500
+	}
+	o, _ := json.Marshal(r)
+
 	return events.APIGatewayProxyResponse{
-		// Body:       string(response),
+		Body:       string(o),
 		Headers:    map[string]string{"Content-Type": "application/json"},
-		StatusCode: 200,
+		StatusCode: s,
 	}, nil
 }
 

@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -13,7 +14,7 @@ import (
 
 type (
 	Table interface {
-		GetByName(name string) Store
+		GetByName(name string) (Store, error)
 	}
 
 	table struct {
@@ -45,19 +46,22 @@ func Initialize() Table {
 	}
 }
 
-func (table table) GetByName(name string) Store {
+func (table table) GetByName(name string) (Store, error) {
 
 	store := Store{}
 	output, err := table.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
 		TableName: aws.String(table.TableName),
 		Key: map[string]types.AttributeValue{
-			"Id": &types.AttributeValueMemberS{Value: name},
+			"Name": &types.AttributeValueMemberS{Value: name},
 		},
 	})
-	attributevalue.UnmarshalMap(output.Item, &store)
 	if err != nil {
-		panic("error on get store")
+		fmt.Println("error on get store: ", err.Error())
+		return store, err
 	}
-
-	return store
+	err = attributevalue.UnmarshalMap(output.Item, &store)
+	if err != nil {
+		fmt.Println("error on UnmarshalMap store: ", err.Error())
+	}
+	return store, err
 }

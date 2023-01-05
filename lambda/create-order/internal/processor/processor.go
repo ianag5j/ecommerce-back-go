@@ -2,56 +2,67 @@ package processor
 
 import (
 	"encoding/json"
-	"fmt"
-	"ianag5j/ecommerce-back-go/create-order/pkg/order/models"
+	order "ianag5j/ecommerce-back-go/create-order/pkg/order/models"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
-	"time"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/google/uuid"
 )
 
 type (
-	BodyRequest struct {
-		StoreName string            `json:"storeName"`
-		Cart      map[string]string `json:"cart"`
-	}
-
 	Processor interface {
-		Process(request events.APIGatewayProxyRequest)
+		Process(request events.APIGatewayProxyRequest) (response, error)
 	}
 
 	processor struct {
-		store *store.Table
+		store store.Table
+		order order.Table
+	}
+
+	CartRequest struct {
+		Id    string `json:"id"`
+		Cant  int    `json:"cant"`
+		Name  string `json:"name"`
+		Price string `json:"price"`
+	}
+
+	BodyRequest struct {
+		StoreName string        `json:"storeName"`
+		Cart      []CartRequest `json:"cart"`
+	}
+
+	response struct {
+		Message string      `json:"message,omitempty"`
+		Order   order.Order `json:"order"`
 	}
 )
 
 func New() Processor {
 	store := store.Initialize()
+	order := order.Initialize()
 	return &processor{
-		store: &store,
+		store: store,
+		order: order,
 	}
 }
 
-func (processor processor) Process(request events.APIGatewayProxyRequest) {
-	sd := store.Initialize()
-
+func (processor processor) Process(request events.APIGatewayProxyRequest) (response, error) {
 	body := BodyRequest{}
+	r := response{}
 	json.Unmarshal([]byte(request.Body), &body)
-
-	fmt.Println(body.Cart)
-	store := sd.GetByName(body.StoreName)
-	fmt.Println(store.Id, store.Name)
-	order := models.Order{
-		Id:      uuid.NewString(),
-		StoreId: store.Id,
-		// Amount: ,
-		PaymentMethod: "Uala",
-		// Cart: ,
-		CreatedAt: time.Now().Format(time.RFC3339),
-		UpdatedAt: time.Now().Format(time.RFC3339),
+	c, err := json.Marshal(body.Cart)
+	if err != nil {
+		r.Message = err.Error()
+		return r, err
 	}
-	fmt.Println(order)
-	// d := database.New()
-	// d.AddOrder(order)
+
+	store, err := processor.store.GetByName(body.StoreName)
+	if err != nil {
+		r.Message = err.Error()
+		return r, err
+	}
+
+	o, err := processor.order.Create(store.Id, "Uala", string(c))
+
+	r.Order = o
+	return r, err
 }
