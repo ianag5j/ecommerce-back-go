@@ -14,14 +14,14 @@ import (
 
 type (
 	Order struct {
-		Id            string `dynamodbav:"Id"`
-		StoreId       string `dynamodbav:"StoreId"`
-		Amount        string `dynamodbav:"Amount"`
-		Status        string `dynamodbav:"Status"`
-		Cart          string `dynamodbav:"Cart"`
-		PaymentMethod string `dynamodbav:"PaymentMethod"`
-		CreatedAt     string `dynamodbav:"CreatedAt"`
-		UpdatedAt     string `dynamodbav:"UpdatedAt"`
+		Id            string  `dynamodbav:"Id"`
+		StoreId       string  `dynamodbav:"StoreId"`
+		Amount        float64 `dynamodbav:"Amount"`
+		Status        string  `dynamodbav:"Status"`
+		Cart          string  `dynamodbav:"Cart"`
+		PaymentMethod string  `dynamodbav:"PaymentMethod"`
+		CreatedAt     string  `dynamodbav:"CreatedAt"`
+		UpdatedAt     string  `dynamodbav:"UpdatedAt"`
 	}
 
 	CartRequest struct {
@@ -32,7 +32,7 @@ type (
 	}
 
 	Table interface {
-		Create(storeId string, paymentMethod string, cart string) (Order, error)
+		Create(amount float64, storeId string, paymentMethod string, cart string) (Order, error)
 	}
 
 	table struct {
@@ -58,11 +58,11 @@ func Initialize() Table {
 	}
 }
 
-func (table table) Create(storeId string, paymentMethod string, cart string) (Order, error) {
+func (table table) Create(amount float64, storeId string, paymentMethod string, cart string) (Order, error) {
 	order := Order{
-		Id:      uuid.NewString(),
-		StoreId: storeId,
-		// Amount: ,
+		Id:            uuid.NewString(),
+		StoreId:       storeId,
+		Amount:        amount,
 		Status:        "PENDING",
 		PaymentMethod: paymentMethod,
 		Cart:          cart,

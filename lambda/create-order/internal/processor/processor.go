@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	order "ianag5j/ecommerce-back-go/create-order/pkg/order/models"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -54,6 +55,12 @@ func (processor processor) Process(request events.APIGatewayProxyRequest) (respo
 		r.Message = err.Error()
 		return r, err
 	}
+	var amount float64
+	for _, p := range body.Cart {
+		pa, _ := strconv.ParseFloat(p.Price, 64)
+		pc := float64(p.Cant)
+		amount += pc * pa
+	}
 
 	store, err := processor.store.GetByName(body.StoreName)
 	if err != nil {
@@ -61,7 +68,7 @@ func (processor processor) Process(request events.APIGatewayProxyRequest) (respo
 		return r, err
 	}
 
-	o, err := processor.order.Create(store.Id, "Uala", string(c))
+	o, err := processor.order.Create(amount, store.Id, "Uala", string(c))
 
 	r.Order = o
 	return r, err
