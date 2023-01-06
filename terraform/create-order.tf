@@ -46,8 +46,6 @@ resource "aws_apigatewayv2_integration" "create_order" {
 resource "aws_apigatewayv2_route" "create_order" {
   api_id = data.terraform_remote_state.network.outputs.api_id
 
-  route_key          = "POST /v2/orders"
-  target             = "integrations/${aws_apigatewayv2_integration.create_order.id}"
-  authorizer_id      = data.terraform_remote_state.network.outputs.authorizer_id
-  authorization_type = "CUSTOM"
+  route_key = "POST /v2/orders"
+  target    = "integrations/${aws_apigatewayv2_integration.create_order.id}"
 }
