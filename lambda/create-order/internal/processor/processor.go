@@ -2,7 +2,7 @@ package processor
 
 import (
 	"encoding/json"
-	"fmt"
+	uala "ianag5j/ecommerce-back-go/create-order/pkg/clients"
 	credential "ianag5j/ecommerce-back-go/create-order/pkg/credential/models"
 	order "ianag5j/ecommerce-back-go/create-order/pkg/order/models"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
@@ -35,8 +35,9 @@ type (
 	}
 
 	response struct {
-		Message string      `json:"message,omitempty"`
-		Order   order.Order `json:"order"`
+		Message   string         `json:"message,omitempty"`
+		Order     order.Order    `json:"order"`
+		UalaOrder uala.UalaOrder `json:"ualaOrder"`
 	}
 )
 
@@ -61,7 +62,7 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 		return r, err
 	}
 
-	store, err := p.store.GetByName(body.StoreName)
+	s, err := p.store.GetByName(body.StoreName)
 	if err != nil {
 		r.Message = err.Error()
 		return r, err
@@ -74,10 +75,15 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 		pc := float64(p.Cant)
 		amount += pc * pa
 	}
-	o, err := p.order.Create(amount, store.Id, "Uala", string(cart))
+	o, err := p.order.Create(amount, s.Id, "Uala", string(cart))
 	r.Order = o
 
-	c, err := p.credential.Get(store.UserId, "Uala")
-	fmt.Println(c)
+	c, err := p.credential.Get(s.UserId, "Uala")
+
+	u := uala.New(c)
+	uo, err := u.CreateOrder(o, s)
+	if err == nil {
+		r.UalaOrder = uo
+	}
 	return r, err
 }

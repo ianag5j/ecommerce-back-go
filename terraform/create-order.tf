@@ -11,6 +11,7 @@ resource "aws_lambda_function" "create_order" {
   source_code_hash = base64sha256(data.archive_file.lambda_create_order_zip.output_path)
   runtime          = "go1.x"
   role             = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/dev_serverless_lambda"
+  timeout          = 15
 
   environment {
     variables = {
@@ -18,6 +19,8 @@ resource "aws_lambda_function" "create_order" {
       ORDERS_TABLE      = "${terraform.workspace}Orders"
       CREDENTIALS_TABLE = "${terraform.workspace}Credentials"
       ENVIROMENT        = terraform.workspace
+      FRONT_BASE_URL    = "https://ecommerce-front-git-development-iangonzalez-ualacomar.vercel.app"
+      LAMBDA_URL        = data.terraform_remote_state.network.outputs.base_url
     }
   }
 }

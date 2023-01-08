@@ -8,14 +8,19 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	p := processor.New()
 	s := 200
 	r, err := p.Process(request)
+	o, _ := json.Marshal(r)
 	if err != nil {
 		s = 500
+		o, _ = json.Marshal(ErrorResponse{Error: err.Error()})
 	}
-	o, _ := json.Marshal(r)
 
 	return events.APIGatewayProxyResponse{
 		Body:       string(o),
