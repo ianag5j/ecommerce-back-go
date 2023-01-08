@@ -16,6 +16,7 @@ resource "aws_lambda_function" "create_order" {
     variables = {
       STORES_TABLE = "${terraform.workspace}Stores"
       ORDERS_TABLE = "${terraform.workspace}Orders"
+      ENVIROMENT   = terraform.workspace
     }
   }
 }
