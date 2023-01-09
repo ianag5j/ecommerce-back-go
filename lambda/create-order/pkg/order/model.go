@@ -14,6 +14,8 @@ import (
 type (
 	Table interface {
 		Save(o Order) (orderModel, error)
+		Update(o Order) (orderModel, error)
+		getOrderModel(o Order) (orderModel, error)
 	}
 
 	table struct {
@@ -52,9 +54,51 @@ func New() Table {
 }
 
 func (t table) Save(o Order) (orderModel, error) {
-	shs, _ := json.Marshal(o.StatusHistory)
-	c, _ := json.Marshal(o.Cart)
-	order := orderModel{
+	order, err := t.getOrderModel(o)
+	if err != nil {
+		return order, err
+	}
+
+	item, err := attributevalue.MarshalMap(order)
+	if err != nil {
+		return order, err
+	}
+
+	_, err = t.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
+		TableName: aws.String(t.TableName), Item: item,
+	})
+	return order, err
+}
+
+func (t table) Update(o Order) (orderModel, error) {
+	order, err := t.getOrderModel(o)
+	if err != nil {
+		return order, err
+	}
+
+	item, err := attributevalue.MarshalMap(order)
+	if err != nil {
+		return order, err
+	}
+
+	_, err = t.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
+		TableName: aws.String(t.TableName), Item: item,
+	})
+	return order, err
+}
+
+func (t table) getOrderModel(o Order) (orderModel, error) {
+	order := orderModel{}
+	shs, err := json.Marshal(o.StatusHistory)
+	if err != nil {
+		return order, err
+	}
+	c, err := json.Marshal(o.Cart)
+	if err != nil {
+		return order, err
+	}
+
+	order = orderModel{
 		Id:            o.Id,
 		StoreId:       o.StoreId,
 		Amount:        o.Amount,
@@ -66,13 +110,5 @@ func (t table) Save(o Order) (orderModel, error) {
 		UpdatedAt:     o.UpdatedAt,
 	}
 
-	item, err := attributevalue.MarshalMap(order)
-	if err != nil {
-		return order, err
-	}
-
-	_, err = t.DynamoDbClient.PutItem(context.TODO(), &dynamodb.PutItemInput{
-		TableName: aws.String(t.TableName), Item: item,
-	})
 	return order, err
 }

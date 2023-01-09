@@ -16,6 +16,7 @@ type (
 		StatusHistory []statusHistory `json:"statusHistory"`
 		Cart          []cartRequest   `json:"cart"`
 		PaymentMethod string          `json:"paymentMethod"`
+		ExternalId    string          `json:"externalId,omitempty"`
 		CreatedAt     string          `json:"createdAt"`
 		UpdatedAt     string          `json:"updatedAt"`
 	}
@@ -23,6 +24,7 @@ type (
 	statusHistory struct {
 		CreatedAt string `json:"createdAt"`
 		Status    string `json:"status"`
+		Message   string `json:"message,omitempty"`
 	}
 
 	cartRequest struct {
@@ -50,4 +52,9 @@ func Create(amount float64, storeId string, paymentMethod string, cart string) (
 	}
 
 	return o, nil
+}
+
+func UpdateStatus(o *Order, status string) {
+	o.StatusHistory = append(o.StatusHistory, statusHistory{Status: status, CreatedAt: time.Now().Format(time.RFC3339)})
+	o.Status = status
 }

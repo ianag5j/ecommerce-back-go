@@ -35,8 +35,7 @@ type (
 	}
 
 	response struct {
-		Message   string         `json:"message,omitempty"`
-		Order     order.Order    `json:"order"`
+		Order     *order.Order   `json:"order"`
 		UalaOrder uala.UalaOrder `json:"ualaOrder"`
 	}
 )
@@ -58,13 +57,11 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 	json.Unmarshal([]byte(request.Body), &body)
 	cart, err := json.Marshal(body.Cart)
 	if err != nil {
-		r.Message = err.Error()
 		return r, err
 	}
 
 	s, err := p.store.GetByName(body.StoreName)
 	if err != nil {
-		r.Message = err.Error()
 		return r, err
 	}
 
@@ -77,14 +74,31 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 	}
 
 	o, err := order.Create(amount, s.Id, "Uala", string(cart))
-	r.Order = o
+	if err != nil {
+		return r, err
+	}
+	r.Order = &o
+
 	_, err = p.order.Save(o)
+	if err != nil {
+		return r, err
+	}
 
 	c, err := p.credential.Get(s.UserId, "Uala")
+	if err != nil {
+		return r, err
+	}
+
 	u := uala.New(c)
 	uo, err := u.CreateOrder(o, s)
-	if err == nil {
-		r.UalaOrder = uo
+	if err != nil {
+		return r, err
 	}
+
+	r.UalaOrder = uo
+	o.ExternalId = uo.Uuid
+	order.UpdateStatus(&o, "PENDING")
+	_, err = p.order.Update(o)
+
 	return r, err
 }
