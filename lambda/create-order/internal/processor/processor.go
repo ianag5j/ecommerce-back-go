@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	uala "ianag5j/ecommerce-back-go/create-order/pkg/clients"
 	credential "ianag5j/ecommerce-back-go/create-order/pkg/credential/models"
-	order "ianag5j/ecommerce-back-go/create-order/pkg/order/models"
+	"ianag5j/ecommerce-back-go/create-order/pkg/order"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
 	"strconv"
 
@@ -43,7 +43,7 @@ type (
 
 func New() Processor {
 	store := store.Initialize()
-	order := order.Initialize()
+	order := order.New()
 	credential := credential.Initialize()
 	return &processor{
 		store:      store,
@@ -75,11 +75,12 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 		pc := float64(p.Cant)
 		amount += pc * pa
 	}
-	o, err := p.order.Create(amount, s.Id, "Uala", string(cart))
+
+	o, err := order.Create(amount, s.Id, "Uala", string(cart))
 	r.Order = o
+	_, err = p.order.Save(o)
 
 	c, err := p.credential.Get(s.UserId, "Uala")
-
 	u := uala.New(c)
 	uo, err := u.CreateOrder(o, s)
 	if err == nil {

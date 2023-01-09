@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	credential "ianag5j/ecommerce-back-go/create-order/pkg/credential/models"
-	order "ianag5j/ecommerce-back-go/create-order/pkg/order/models"
+	"ianag5j/ecommerce-back-go/create-order/pkg/order"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
 	"io/ioutil"
 	"net/http"
