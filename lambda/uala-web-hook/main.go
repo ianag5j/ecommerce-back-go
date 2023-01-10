@@ -10,18 +10,20 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type BodyRequest struct {
-	Status string `json:"status"`
-}
+type (
+	BodyRequest struct {
+		Status string `json:"status"`
+	}
 
-type Response struct {
-	Message string
-}
+	Response struct {
+		Message string
+	}
 
-type ResponseError struct {
-	Message string
-	Error   string
-}
+	ResponseError struct {
+		Message string
+		Error   string
+	}
+)
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Println(request.Body)
