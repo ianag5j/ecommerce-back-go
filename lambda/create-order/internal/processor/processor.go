@@ -2,7 +2,8 @@ package processor
 
 import (
 	"encoding/json"
-	uala "ianag5j/ecommerce-back-go/create-order/pkg/clients"
+
+	"ianag5j/ecommerce-back-go/create-order/pkg/clients/uala"
 	"ianag5j/ecommerce-back-go/create-order/pkg/credential"
 	"ianag5j/ecommerce-back-go/create-order/pkg/order"
 	"ianag5j/ecommerce-back-go/create-order/pkg/store"
