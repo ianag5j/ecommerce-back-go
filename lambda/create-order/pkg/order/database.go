@@ -12,13 +12,13 @@ import (
 )
 
 type (
-	Table interface {
+	Database interface {
 		Save(o Order) (orderModel, error)
 		Update(o Order) (orderModel, error)
 		getOrderModel(o Order) (orderModel, error)
 	}
 
-	table struct {
+	database struct {
 		DynamoDbClient *dynamodb.Client
 		TableName      string
 	}
@@ -36,7 +36,7 @@ type (
 	}
 )
 
-func New() Table {
+func NewDatabase() Database {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
 		return nil
@@ -47,13 +47,13 @@ func New() Table {
 
 	svc := dynamodb.NewFromConfig(cfg)
 
-	return &table{
+	return &database{
 		DynamoDbClient: svc,
 		TableName:      os.Getenv("ORDERS_TABLE"),
 	}
 }
 
-func (t table) Save(o Order) (orderModel, error) {
+func (t database) Save(o Order) (orderModel, error) {
 	order, err := t.getOrderModel(o)
 	if err != nil {
 		return order, err
@@ -70,7 +70,7 @@ func (t table) Save(o Order) (orderModel, error) {
 	return order, err
 }
 
-func (t table) Update(o Order) (orderModel, error) {
+func (t database) Update(o Order) (orderModel, error) {
 	order, err := t.getOrderModel(o)
 	if err != nil {
 		return order, err
@@ -87,7 +87,7 @@ func (t table) Update(o Order) (orderModel, error) {
 	return order, err
 }
 
-func (t table) getOrderModel(o Order) (orderModel, error) {
+func (t database) getOrderModel(o Order) (orderModel, error) {
 	order := orderModel{}
 	shs, err := json.Marshal(o.StatusHistory)
 	if err != nil {
