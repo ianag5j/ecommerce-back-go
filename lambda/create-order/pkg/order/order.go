@@ -9,6 +9,17 @@ import (
 )
 
 type (
+	Client interface {
+		Create(cart []CartRequest, storeId string, paymentMethod string) (Order, error)
+		UpdateStatus(o *Order, status string) error
+	}
+
+	client struct {
+		d Database
+	}
+)
+
+type (
 	Order struct {
 		Id            string          `json:"id"`
 		StoreId       string          `json:"storeId"`
@@ -36,7 +47,13 @@ type (
 	}
 )
 
-func Create(cart []CartRequest, storeId string, paymentMethod string) (Order, error) {
+func New() Client {
+	return &client{
+		d: NewDatabase(),
+	}
+}
+
+func (cli client) Create(cart []CartRequest, storeId string, paymentMethod string) (Order, error) {
 	o := Order{}
 	sh := []statusHistory{{Status: "CREATED", CreatedAt: time.Now().Format(time.RFC3339)}}
 
@@ -57,12 +74,18 @@ func Create(cart []CartRequest, storeId string, paymentMethod string) (Order, er
 		UpdatedAt:     time.Now().Format(time.RFC3339),
 	}
 
-	return o, nil
+	_, err = cli.d.Save(o)
+
+	return o, err
 }
 
-func UpdateStatus(o *Order, status string) {
+func (cli client) UpdateStatus(o *Order, status string) error {
 	o.StatusHistory = append(o.StatusHistory, statusHistory{Status: status, CreatedAt: time.Now().Format(time.RFC3339)})
 	o.Status = status
+
+	order := *o
+	_, err := cli.d.Update(order)
+	return err
 }
 
 func getTotalAmount(c []CartRequest) (float64, error) {

@@ -16,9 +16,9 @@ type (
 	}
 
 	processor struct {
-		store      store.Table
-		order      order.Table
-		credential credential.Table
+		s store.Table
+		o order.Client
+		c credential.Table
 	}
 
 	BodyRequest struct {
@@ -33,13 +33,10 @@ type (
 )
 
 func New() Processor {
-	store := store.Initialize()
-	order := order.New()
-	credential := credential.Initialize()
 	return &processor{
-		store:      store,
-		order:      order,
-		credential: credential,
+		s: store.Initialize(),
+		o: order.New(),
+		c: credential.Initialize(),
 	}
 }
 
@@ -48,23 +45,18 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 	r := response{}
 	json.Unmarshal([]byte(request.Body), &body)
 
-	s, err := p.store.GetByName(body.StoreName)
+	s, err := p.s.GetByName(body.StoreName)
 	if err != nil {
 		return r, err
 	}
 
-	o, err := order.Create(body.Cart, s.Id, "Uala")
+	o, err := p.o.Create(body.Cart, s.Id, "Uala")
 	if err != nil {
 		return r, err
 	}
 	r.Order = &o
 
-	_, err = p.order.Save(o)
-	if err != nil {
-		return r, err
-	}
-
-	c, err := p.credential.Get(s.UserId, "Uala")
+	c, err := p.c.Get(s.UserId, "Uala")
 	if err != nil {
 		return r, err
 	}
@@ -77,8 +69,7 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 
 	r.UalaOrder = uo
 	o.ExternalId = uo.Uuid
-	order.UpdateStatus(&o, "PENDING")
-	_, err = p.order.Update(o)
 
+	err = p.o.UpdateStatus(&o, "PENDING")
 	return r, err
 }
