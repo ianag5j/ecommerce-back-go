@@ -2,12 +2,10 @@ package processor
 
 import (
 	"encoding/json"
-	"errors"
 	uala "ianag5j/ecommerce-back-go/create-order/pkg/clients"
 	credential "ianag5j/ecommerce-back-go/create-order/pkg/credential/models"
 	"ianag5j/ecommerce-back-go/create-order/pkg/order"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
-	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -55,12 +53,7 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 		return r, err
 	}
 
-	ta, err := getTotalAmount(body)
-	if err != nil {
-		return r, err
-	}
-
-	o, err := order.Create(ta, s.Id, "Uala", body.Cart)
+	o, err := order.Create(body.Cart, s.Id, "Uala")
 	if err != nil {
 		return r, err
 	}
@@ -88,19 +81,4 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 	_, err = p.order.Update(o)
 
 	return r, err
-}
-
-func getTotalAmount(b BodyRequest) (float64, error) {
-	ta := 0.0
-
-	//TODO: validate amount with products amounts in database
-	for _, p := range b.Cart {
-		pa, err := strconv.ParseFloat(p.Price, 64)
-		if err != nil {
-			return ta, errors.New("error on parse amount")
-		}
-		pc := float64(p.Cant)
-		ta += pc * pa
-	}
-	return ta, nil
 }
