@@ -3,7 +3,7 @@ package processor
 import (
 	"encoding/json"
 	uala "ianag5j/ecommerce-back-go/create-order/pkg/clients"
-	credential "ianag5j/ecommerce-back-go/create-order/pkg/credential/models"
+	"ianag5j/ecommerce-back-go/create-order/pkg/credential"
 	"ianag5j/ecommerce-back-go/create-order/pkg/order"
 	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
 
@@ -18,7 +18,7 @@ type (
 	processor struct {
 		s store.Table
 		o order.Client
-		c credential.Table
+		c credential.Database
 	}
 
 	BodyRequest struct {
@@ -36,7 +36,7 @@ func New() Processor {
 	return &processor{
 		s: store.Initialize(),
 		o: order.New(),
-		c: credential.Initialize(),
+		c: credential.New(),
 	}
 }
 
