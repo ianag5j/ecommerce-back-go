@@ -23,16 +23,9 @@ type (
 		credential credential.Table
 	}
 
-	CartRequest struct {
-		Id    string `json:"id"`
-		Cant  int    `json:"cant"`
-		Name  string `json:"name"`
-		Price string `json:"price"`
-	}
-
 	BodyRequest struct {
-		StoreName string        `json:"storeName"`
-		Cart      []CartRequest `json:"cart"`
+		StoreName string              `json:"storeName"`
+		Cart      []order.CartRequest `json:"cart"`
 	}
 
 	response struct {
@@ -56,10 +49,6 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 	body := BodyRequest{}
 	r := response{}
 	json.Unmarshal([]byte(request.Body), &body)
-	cart, err := json.Marshal(body.Cart)
-	if err != nil {
-		return r, err
-	}
 
 	s, err := p.store.GetByName(body.StoreName)
 	if err != nil {
@@ -71,7 +60,7 @@ func (p processor) Process(request events.APIGatewayProxyRequest) (response, err
 		return r, err
 	}
 
-	o, err := order.Create(ta, s.Id, "Uala", string(cart))
+	o, err := order.Create(ta, s.Id, "Uala", body.Cart)
 	if err != nil {
 		return r, err
 	}

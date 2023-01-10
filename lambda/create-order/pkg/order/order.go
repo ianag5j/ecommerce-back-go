@@ -1,7 +1,6 @@
 package order
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,7 +13,7 @@ type (
 		Amount        float64         `json:"amount"`
 		Status        string          `json:"status"`
 		StatusHistory []statusHistory `json:"statusHistory"`
-		Cart          []cartRequest   `json:"cart"`
+		Cart          []CartRequest   `json:"cart"`
 		PaymentMethod string          `json:"paymentMethod"`
 		ExternalId    string          `json:"externalId,omitempty"`
 		CreatedAt     string          `json:"createdAt"`
@@ -27,7 +26,7 @@ type (
 		Message   string `json:"message,omitempty"`
 	}
 
-	cartRequest struct {
+	CartRequest struct {
 		Id    string `json:"id"`
 		Cant  int    `json:"cant"`
 		Name  string `json:"name"`
@@ -35,10 +34,8 @@ type (
 	}
 )
 
-func Create(amount float64, storeId string, paymentMethod string, cart string) (Order, error) {
+func Create(amount float64, storeId string, paymentMethod string, cart []CartRequest) (Order, error) {
 	sh := []statusHistory{{Status: "CREATED", CreatedAt: time.Now().Format(time.RFC3339)}}
-	c := []cartRequest{}
-	json.Unmarshal([]byte(cart), &c)
 	o := Order{
 		Id:            uuid.NewString(),
 		StoreId:       storeId,
@@ -46,7 +43,7 @@ func Create(amount float64, storeId string, paymentMethod string, cart string) (
 		Status:        "CREATED",
 		StatusHistory: sh,
 		PaymentMethod: paymentMethod,
-		Cart:          c,
+		Cart:          cart,
 		CreatedAt:     time.Now().Format(time.RFC3339),
 		UpdatedAt:     time.Now().Format(time.RFC3339),
 	}
