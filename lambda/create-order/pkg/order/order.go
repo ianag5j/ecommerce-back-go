@@ -1,7 +1,8 @@
 package order
 
 import (
-	"encoding/json"
+	"errors"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -14,7 +15,7 @@ type (
 		Amount        float64         `json:"amount"`
 		Status        string          `json:"status"`
 		StatusHistory []statusHistory `json:"statusHistory"`
-		Cart          []cartRequest   `json:"cart"`
+		Cart          []CartRequest   `json:"cart"`
 		PaymentMethod string          `json:"paymentMethod"`
 		ExternalId    string          `json:"externalId,omitempty"`
 		CreatedAt     string          `json:"createdAt"`
@@ -27,7 +28,7 @@ type (
 		Message   string `json:"message,omitempty"`
 	}
 
-	cartRequest struct {
+	CartRequest struct {
 		Id    string `json:"id"`
 		Cant  int    `json:"cant"`
 		Name  string `json:"name"`
@@ -35,18 +36,23 @@ type (
 	}
 )
 
-func Create(amount float64, storeId string, paymentMethod string, cart string) (Order, error) {
+func Create(cart []CartRequest, storeId string, paymentMethod string) (Order, error) {
+	o := Order{}
 	sh := []statusHistory{{Status: "CREATED", CreatedAt: time.Now().Format(time.RFC3339)}}
-	c := []cartRequest{}
-	json.Unmarshal([]byte(cart), &c)
-	o := Order{
+
+	ta, err := getTotalAmount(cart)
+	if err != nil {
+		return o, err
+	}
+
+	o = Order{
 		Id:            uuid.NewString(),
 		StoreId:       storeId,
-		Amount:        amount,
+		Amount:        ta,
 		Status:        "CREATED",
 		StatusHistory: sh,
 		PaymentMethod: paymentMethod,
-		Cart:          c,
+		Cart:          cart,
 		CreatedAt:     time.Now().Format(time.RFC3339),
 		UpdatedAt:     time.Now().Format(time.RFC3339),
 	}
@@ -57,4 +63,19 @@ func Create(amount float64, storeId string, paymentMethod string, cart string) (
 func UpdateStatus(o *Order, status string) {
 	o.StatusHistory = append(o.StatusHistory, statusHistory{Status: status, CreatedAt: time.Now().Format(time.RFC3339)})
 	o.Status = status
+}
+
+func getTotalAmount(c []CartRequest) (float64, error) {
+	ta := 0.0
+
+	//TODO: validate amount with products amounts in database
+	for _, p := range c {
+		pa, err := strconv.ParseFloat(p.Price, 64)
+		if err != nil {
+			return ta, errors.New("error on parse amount")
+		}
+		pc := float64(p.Cant)
+		ta += pc * pa
+	}
+	return ta, nil
 }
