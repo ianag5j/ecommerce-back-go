@@ -1,4 +1,4 @@
-package models
+package store
 
 import (
 	"context"
@@ -13,11 +13,11 @@ import (
 )
 
 type (
-	Table interface {
+	Database interface {
 		GetByName(name string) (Store, error)
 	}
 
-	table struct {
+	database struct {
 		DynamoDbClient *dynamodb.Client
 		TableName      string
 	}
@@ -29,7 +29,7 @@ type (
 	}
 )
 
-func Initialize() Table {
+func New() Database {
 	cfg, err := config.LoadDefaultConfig(context.TODO(), func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
 		return nil
@@ -40,17 +40,17 @@ func Initialize() Table {
 
 	svc := dynamodb.NewFromConfig(cfg)
 
-	return &table{
+	return &database{
 		DynamoDbClient: svc,
 		TableName:      os.Getenv("STORES_TABLE"),
 	}
 }
 
-func (table table) GetByName(name string) (Store, error) {
+func (d database) GetByName(name string) (Store, error) {
 
 	store := Store{}
-	output, err := table.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
-		TableName: aws.String(table.TableName),
+	output, err := d.DynamoDbClient.GetItem(context.TODO(), &dynamodb.GetItemInput{
+		TableName: aws.String(d.TableName),
 		Key: map[string]types.AttributeValue{
 			"Name": &types.AttributeValueMemberS{Value: name},
 		},

@@ -5,7 +5,7 @@ import (
 	uala "ianag5j/ecommerce-back-go/create-order/pkg/clients"
 	"ianag5j/ecommerce-back-go/create-order/pkg/credential"
 	"ianag5j/ecommerce-back-go/create-order/pkg/order"
-	store "ianag5j/ecommerce-back-go/create-order/pkg/store/models"
+	"ianag5j/ecommerce-back-go/create-order/pkg/store"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -16,7 +16,7 @@ type (
 	}
 
 	processor struct {
-		s store.Table
+		s store.Database
 		o order.Client
 		c credential.Database
 	}
@@ -34,7 +34,7 @@ type (
 
 func New() Processor {
 	return &processor{
-		s: store.Initialize(),
+		s: store.New(),
 		o: order.New(),
 		c: credential.New(),
 	}
