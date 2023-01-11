@@ -35,3 +35,10 @@ provider "aws" {
 }
 
 data "aws_caller_identity" "current" {}
+
+module "lambda" {
+  source = "./lambda"
+  providers = {
+    aws = aws
+  }
+}
