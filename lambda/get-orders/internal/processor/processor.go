@@ -1,7 +1,6 @@
 package processor
 
 import (
-	"ianag5j/ecommerce-back-go/create-order/pkg/credential"
 	"ianag5j/ecommerce-back-go/get-orders/pkg/order"
 	"ianag5j/ecommerce-back-go/get-orders/pkg/store"
 	"ianag5j/ecommerce-back-go/get-orders/utils"
@@ -17,7 +16,6 @@ type (
 	processor struct {
 		s store.Database
 		o order.Client
-		c credential.Database
 	}
 
 	response struct {
@@ -29,7 +27,6 @@ func New() Processor {
 	return &processor{
 		s: store.New(),
 		o: order.New(),
-		c: credential.New(),
 	}
 }
 
