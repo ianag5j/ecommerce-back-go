@@ -19,7 +19,7 @@ type (
 	}
 
 	response struct {
-		Orders []order.OrderModel `json:"order"`
+		Orders []order.OrderModel `json:"orders"`
 	}
 )
 

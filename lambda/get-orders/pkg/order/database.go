@@ -22,15 +22,15 @@ type (
 	}
 
 	OrderModel struct {
-		Id            string  `dynamodbav:"Id"`
-		StoreId       string  `dynamodbav:"StoreId"`
-		Amount        float64 `dynamodbav:"Amount"`
-		Status        string  `dynamodbav:"Status"`
-		StatusHistory string  `dynamodbav:"StatusHistory"`
-		Cart          string  `dynamodbav:"Cart"`
-		PaymentMethod string  `dynamodbav:"PaymentMethod"`
-		CreatedAt     string  `dynamodbav:"CreatedAt"`
-		UpdatedAt     string  `dynamodbav:"UpdatedAt"`
+		Id            string `dynamodbav:"Id"`
+		StoreId       string `dynamodbav:"StoreId"`
+		Amount        string `dynamodbav:"Amount"`
+		Status        string `dynamodbav:"Status"`
+		StatusHistory string `dynamodbav:"StatusHistory"`
+		Cart          string `dynamodbav:"Cart"`
+		PaymentMethod string `dynamodbav:"PaymentMethod"`
+		CreatedAt     string `dynamodbav:"CreatedAt"`
+		UpdatedAt     string `dynamodbav:"UpdatedAt"`
 	}
 )
 
