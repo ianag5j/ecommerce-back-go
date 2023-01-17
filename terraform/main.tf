@@ -41,4 +41,8 @@ module "lambda" {
   providers = {
     aws = aws
   }
+
+  api_id        = data.terraform_remote_state.network.outputs.api_id
+  authorizer_id = data.terraform_remote_state.network.outputs.authorizer_id
+  base_url      = data.terraform_remote_state.network.outputs.base_url
 }
