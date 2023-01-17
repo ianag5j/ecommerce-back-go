@@ -26,7 +26,7 @@ resource "aws_lambda_permission" "api_gw_get_orders" {
   function_name = aws_lambda_function.get_orders.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${data.terraform_remote_state.network.outputs.api_id}/*/*"
+  source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${var.api_id}/*/*"
 }
 
 resource "aws_cloudwatch_log_group" "get_orders" {
@@ -36,7 +36,7 @@ resource "aws_cloudwatch_log_group" "get_orders" {
 
 # ############ API GATEWAY ############
 resource "aws_apigatewayv2_integration" "get_orders" {
-  api_id = data.terraform_remote_state.network.outputs.api_id
+  api_id = var.api_id
 
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
@@ -44,10 +44,10 @@ resource "aws_apigatewayv2_integration" "get_orders" {
 }
 
 resource "aws_apigatewayv2_route" "get_orders" {
-  api_id = data.terraform_remote_state.network.outputs.api_id
+  api_id = var.api_id
 
   route_key          = "GET /v2/orders"
   target             = "integrations/${aws_apigatewayv2_integration.get_orders.id}"
-  authorizer_id      = data.terraform_remote_state.network.outputs.authorizer_id
+  authorizer_id      = var.authorizer_id
   authorization_type = "CUSTOM"
 }
