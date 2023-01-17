@@ -46,3 +46,10 @@ module "lambda" {
   authorizer_id = data.terraform_remote_state.network.outputs.authorizer_id
   base_url      = data.terraform_remote_state.network.outputs.base_url
 }
+
+module "dynamodb" {
+  source = "./dynamodb"
+  providers = {
+    aws = aws
+  }
+}
