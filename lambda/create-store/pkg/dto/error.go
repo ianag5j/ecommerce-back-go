@@ -12,8 +12,8 @@ const (
 
 type RequestError struct {
 	StatusCode int    `json:"-"`
-	ErrorCode  int    `json:"error_code"`
-	Err        string `json:"error"`
+	ErrorCode  int    `json:"error_code,omitempty"`
+	Err        string `json:"error,omitempty"`
 }
 
 func (r *RequestError) Error() string {
