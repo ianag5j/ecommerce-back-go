@@ -20,7 +20,9 @@ func NewHandler() Handler {
 }
 
 func (h Handler) EventHandler(r events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response, _ := json.Marshal(h.p.Process(r))
+	rb := h.p.Process(r)
+
+	response, _ := json.Marshal(rb)
 
 	return events.APIGatewayProxyResponse{
 		Body: string(response),
