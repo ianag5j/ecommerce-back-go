@@ -54,6 +54,7 @@ func (c client) CreateStore(storeName string, userId string) (Store, dto.Request
 }
 
 func (c client) validateBeforeCreateStore(storeName string, userId string) dto.RequestError {
+	// TODO: use async
 	s, err := c.d.GetStoreByName(storeName)
 	if err != nil {
 		return dto.RequestError{
