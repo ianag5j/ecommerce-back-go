@@ -48,6 +48,6 @@ resource "aws_apigatewayv2_route" "get_store" {
 
   route_key          = "GET /v2/store"
   target             = "integrations/${aws_apigatewayv2_integration.get_store.id}"
-  authorizer_id      = var.authorizer_id
+  authorizer_id      = aws_apigatewayv2_authorizer.custom_authorizer.id
   authorization_type = "CUSTOM"
 }

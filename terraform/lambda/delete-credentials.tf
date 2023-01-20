@@ -47,6 +47,6 @@ resource "aws_apigatewayv2_route" "delete_credentials" {
 
   route_key          = "DELETE /v2/credentials"
   target             = "integrations/${aws_apigatewayv2_integration.delete_credentials.id}"
-  authorizer_id      = var.authorizer_id
+  authorizer_id      = aws_apigatewayv2_authorizer.custom_authorizer.id
   authorization_type = "CUSTOM"
 }

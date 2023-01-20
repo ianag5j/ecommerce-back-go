@@ -4,6 +4,9 @@ on:
     branches:
       - "develop"
 
+env:
+  TF_VAR_auth0_domain: ${{ secrets.AUTH0_DOMAIN_DEV }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

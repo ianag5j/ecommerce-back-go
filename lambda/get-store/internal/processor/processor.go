@@ -3,7 +3,6 @@ package processor
 import (
 	"ianag5j/ecommerce-back-go/get-store/pkg/dto"
 	"ianag5j/ecommerce-back-go/get-store/pkg/store"
-	"ianag5j/ecommerce-back-go/get-store/pkg/utils"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -35,7 +34,8 @@ func New() Processor {
 }
 
 func (p processor) Process(r events.APIGatewayProxyRequest) ResponseBody {
-	s, re := p.s.GetStoreByUserId(utils.GetUserId(r.Headers["authorization"]))
+	ui := r.RequestContext.Authorizer["userId"]
+	s, re := p.s.GetStoreByUserId(ui.(string))
 	if re.ErrorCode > 0 {
 		return ResponseBody{
 			re,
