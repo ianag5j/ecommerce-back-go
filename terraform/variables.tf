@@ -6,3 +6,10 @@ variable "aws_region" {
   type    = string
   default = "us-east-1"
 }
+
+variable "auth0_domain" {
+  description = "auth0 domain url."
+
+  type    = string
+  default = "https://{stage}-{auth0_id}.us.auth0.com"
+}
