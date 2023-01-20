@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"ianag5j/ecommerce-back-go/create-store/pkg/dto"
 	"ianag5j/ecommerce-back-go/create-store/pkg/store"
-	"ianag5j/ecommerce-back-go/create-store/pkg/utils"
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -50,7 +49,8 @@ func (p processor) Process(r events.APIGatewayProxyRequest) ResponseBody {
 		}
 	}
 
-	s, re := p.s.CreateStore(b.StoreName, utils.GetUserId(r.Headers["authorization"]))
+	ui := r.RequestContext.Authorizer["userId"]
+	s, re := p.s.CreateStore(b.StoreName, ui.(string))
 
 	if re.ErrorCode > 0 {
 		return ResponseBody{
