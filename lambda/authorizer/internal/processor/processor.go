@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"ianag5j/ecommerce-back-go/authorizer/pkg/dto"
 	"ianag5j/ecommerce-back-go/authorizer/pkg/jwk"
 	"strings"
 
@@ -18,14 +17,6 @@ type (
 	}
 
 	processor struct {
-	}
-
-	RequestBody struct {
-		StoreName string `json:"name"`
-	}
-
-	ResponseBody struct {
-		dto.RequestError
 	}
 )
 
