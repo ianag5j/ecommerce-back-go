@@ -38,9 +38,6 @@ data "aws_caller_identity" "current" {}
 
 module "lambda" {
   source = "./lambda"
-  providers = {
-    aws = aws
-  }
 
   api_id        = data.terraform_remote_state.network.outputs.api_id
   authorizer_id = data.terraform_remote_state.network.outputs.authorizer_id
@@ -49,7 +46,4 @@ module "lambda" {
 
 module "dynamodb" {
   source = "./dynamodb"
-  providers = {
-    aws = aws
-  }
 }
