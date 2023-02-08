@@ -13,3 +13,10 @@ variable "auth0_domain" {
   type    = string
   default = "https://{stage}-{auth0_id}.us.auth0.com"
 }
+
+variable "rollbar_token" {
+  description = "rollbar token."
+
+  type    = string
+  default = ""
+}

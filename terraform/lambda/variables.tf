@@ -13,3 +13,9 @@ variable "base_url" {
 variable "auth0_domain" {
   type = string
 }
+
+variable "rollbar_token" {
+  description = "rollbar token."
+
+  type    = string
+}
