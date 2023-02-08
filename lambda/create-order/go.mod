@@ -8,8 +8,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.18.7
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.10.8
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.9
-	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/google/uuid v1.3.0
+	github.com/rollbar/rollbar-go v1.4.5
 )
 
 require (

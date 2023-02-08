@@ -1,0 +1,27 @@
+name: Validate PR
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Build lambdas
+        run: sh build.sh
+      - uses: hashicorp/setup-terraform@v2
+      - name: Run Plan
+        run: |
+          cd terraform &&
+          terraform init &&
+          terraform workspace select "dev" &&
+          terraform plan

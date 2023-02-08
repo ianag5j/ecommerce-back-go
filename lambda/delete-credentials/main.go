@@ -13,8 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-
-	"ianag5j/ecommerce-back-go/delete-credentials/utils"
 )
 
 type Response struct {
@@ -31,10 +29,11 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	}
 
 	svc := dynamodb.NewFromConfig(cfg)
+	ui := request.RequestContext.Authorizer["userId"]
 	_, err = svc.DeleteItem(context.TODO(), &dynamodb.DeleteItemInput{
 		TableName: aws.String(os.Getenv("CREDENTIALS_TABLE")),
 		Key: map[string]types.AttributeValue{
-			"UserId":   &types.AttributeValueMemberS{Value: utils.GetUserId(request.Headers["authorization"])},
+			"UserId":   &types.AttributeValueMemberS{Value: ui.(string)},
 			"Provider": &types.AttributeValueMemberS{Value: "Uala"},
 		},
 	})

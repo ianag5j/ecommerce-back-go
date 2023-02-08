@@ -8,6 +8,7 @@ for d in */; do
     outupDir="../"
   fi
   outupDir="$outupDir../../bin/$d"
+  go mod tidy
   env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o $outupDir main.go
   echo "builded $d"
   cd ..

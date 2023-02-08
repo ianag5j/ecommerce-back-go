@@ -25,7 +25,7 @@ resource "aws_lambda_permission" "api_gw_delete_credentials" {
   function_name = aws_lambda_function.delete_credentials.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${data.terraform_remote_state.network.outputs.api_id}/*/*"
+  source_arn = "arn:aws:execute-api:us-east-1:${data.aws_caller_identity.current.account_id}:${var.api_id}/*/*"
 }
 
 resource "aws_cloudwatch_log_group" "delete_credentials" {
@@ -35,7 +35,7 @@ resource "aws_cloudwatch_log_group" "delete_credentials" {
 
 # ############ API GATEWAY ############
 resource "aws_apigatewayv2_integration" "delete_credentials" {
-  api_id = data.terraform_remote_state.network.outputs.api_id
+  api_id = var.api_id
 
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
@@ -43,10 +43,10 @@ resource "aws_apigatewayv2_integration" "delete_credentials" {
 }
 
 resource "aws_apigatewayv2_route" "delete_credentials" {
-  api_id = data.terraform_remote_state.network.outputs.api_id
+  api_id = var.api_id
 
   route_key          = "DELETE /v2/credentials"
   target             = "integrations/${aws_apigatewayv2_integration.delete_credentials.id}"
-  authorizer_id      = data.terraform_remote_state.network.outputs.authorizer_id
+  authorizer_id      = aws_apigatewayv2_authorizer.custom_authorizer.id
   authorization_type = "CUSTOM"
 }
