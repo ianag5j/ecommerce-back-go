@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"ianag5j/ecommerce-back-go/create-order/internal/processor"
+	"ianag5j/ecommerce-back-go/create-order/pkg/logger"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,6 +19,8 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 	r, err := p.Process(request)
 	o, _ := json.Marshal(r)
 	if err != nil {
+		l := logger.New()
+		l.LogError(err)
 		s = 500
 		o, _ = json.Marshal(ErrorResponse{Error: err.Error()})
 	}
