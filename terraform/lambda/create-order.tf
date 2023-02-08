@@ -21,6 +21,7 @@ resource "aws_lambda_function" "create_order" {
       ENVIROMENT        = terraform.workspace
       FRONT_BASE_URL    = "https://ecommerce-front-git-development-iangonzalez-ualacomar.vercel.app"
       LAMBDA_URL        = var.base_url
+      ROLLBAR_TOKEN     = var.rollbar_token
     }
   }
 }

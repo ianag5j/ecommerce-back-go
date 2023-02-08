@@ -43,6 +43,7 @@ module "lambda" {
   authorizer_id = data.terraform_remote_state.network.outputs.authorizer_id
   base_url      = data.terraform_remote_state.network.outputs.base_url
   auth0_domain  = var.auth0_domain
+  rollbar_token = var.rollbar_token
 }
 
 module "dynamodb" {
