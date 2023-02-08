@@ -18,4 +18,5 @@ variable "rollbar_token" {
   description = "rollbar token."
 
   type    = string
+  default = ""
 }
