@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
+	"ianag5j/ecommerce-back-go/uala-web-hook/pkg/logger"
 	ds "ianag5j/ecommerce-back-go/uala-web-hook/services/dynamodb"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -25,7 +27,8 @@ type (
 	}
 )
 
-func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	logger.New(ctx).LogInfo(request)
 	fmt.Println(request.Body)
 	fmt.Println(request.PathParameters)
 	body := BodyRequest{}
