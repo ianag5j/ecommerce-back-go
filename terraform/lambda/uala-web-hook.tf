@@ -14,7 +14,9 @@ resource "aws_lambda_function" "uala_web_hook" {
 
   environment {
     variables = {
-      ORDERS_TABLE = "${terraform.workspace}Orders"
+      ORDERS_TABLE  = "${terraform.workspace}Orders"
+      LAMBDA_URL    = var.base_url
+      ROLLBAR_TOKEN = var.rollbar_token
     }
   }
 }
